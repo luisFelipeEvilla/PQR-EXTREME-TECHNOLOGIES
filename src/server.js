@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 // Rutas
 app.use(require('./routes'));
 app.use(require('./routes/autenticacion'));
+app.use('/pqrs', require('./routes/pqrs'));
 
 // Ejecutar servidor
 app.listen(PORT, () => {
