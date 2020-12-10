@@ -1,8 +1,8 @@
 # Crear base de datos
-create database database_pqrs;
+create database pqrs;
 
 # conectarse a la base de datos
-\c database_pqrs;
+\c pqrs;
 
 # Crear tabla de usuarios
 CREATE TABLE users(

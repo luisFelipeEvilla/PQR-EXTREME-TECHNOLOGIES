@@ -10,13 +10,12 @@ pool.connect()
         }
     })
     .catch(err => {
-        console.error(error);
+        console.error(err);
     });
     
 pool.query('SELECT NOW()')
     .then(response => {
         console.log(response.rows);
-        pool.end();
     })
     .catch(err => {
         console.error(err)
