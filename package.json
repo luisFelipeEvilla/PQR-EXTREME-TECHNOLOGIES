@@ -1,0 +1,36 @@
+{
+  "name": "pqr-extreme-technologies",
+  "version": "1.0.0",
+  "description": "aplicacion de PQR para empresa EXTREME TECHNOLOGIES",
+  "main": "./server.js",
+  "scripts": {
+    "start:dev": "nodemon ./src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luisFelipeEvilla/PQR-EXTREME-TECHNOLOGIES.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "js",
+    "handlebars"
+  ],
+  "author": "Luis Felipe Evilla Rodriguez <www.github.com/luisFelipeEvilla>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/luisFelipeEvilla/PQR-EXTREME-TECHNOLOGIES/issues"
+  },
+  "homepage": "https://github.com/luisFelipeEvilla/PQR-EXTREME-TECHNOLOGIES#readme",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
