@@ -31,8 +31,8 @@ CREATE TABLE pqrs(
    tipo tipo_pqr NOT NULL,
    asunto TEXT NOT NULL,
    estado estado_pqr NOT NULL DEFAULT 'Nuevo',
-   created_at DATE DEFAULT current_date,
-   expired_at DATE NOT NULL,
+   created_at TIMESTAMP DEFAULT now(),
+   expired_at TIMESTAMP NOT NULL,
    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

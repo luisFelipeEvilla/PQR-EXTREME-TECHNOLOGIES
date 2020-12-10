@@ -7,11 +7,15 @@ const pool = require('../database');
 
 router.get('/', async (req, res) => {
     const q = {
-        text: 'SELECT username, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id'
+        text: 'SELECT username, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id ORDER BY created_at DESC'
     }
 
     const pqrs = await query(q)
     res.render('pqrs/list', {pqrs});
+})
+
+router.get('/add', (req, res) => {
+    res.render('pqrs/add');
 })
 
 router.get('/:id', async (req, res) => {
@@ -22,10 +26,6 @@ router.get('/:id', async (req, res) => {
 
     const pqr = await query(q);
     res.render('pqrs/pqr', {pqr});
-})
-
-router.get('/add', (req, res) => {
-    res.render('pqrs/add');
 })
 
 router.post('/add', (req, res) => {
@@ -66,9 +66,39 @@ router.get('/delete/:id', async (req, res) => {
     res.redirect('/pqrs');
 })
 
+router.get('/edit/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const q = {
+        text: 'SELECT * FROM pqrs where id = $1',
+        values: [id]
+    }
+
+    const pqr = await query(q);
+
+    res.render('pqrs/edit', {pqr : pqr[0]});
+})
+
+router.post('/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const { 
+        asunto,
+        estado,
+    } = req.body;
+
+    const q = {
+        text: 'UPDATE pqrs SET asunto = $1, estado = $2 WHERE id = $3',
+        values: [asunto, estado, id]
+    }
+    
+    await query(q);
+
+    res.redirect('/pqrs');
+})
+
 async function query(q) {
     let res;
-    console.log(q);
+
     try {
         res = await pool.query(q);
         console.log(res.rows[0]);
