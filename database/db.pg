@@ -1,0 +1,45 @@
+# Crear base de datos
+createdb database_pqrs;
+
+# conectarse a la base de datos
+\c database_pqrs;
+
+# Crear tabla de usuarios
+CREATE TABLE users(
+    id serial PRIMARY KEY,
+    username VARCHAR(16) NOT NULL UNIQUE,
+    password VARCHAR(60) NOT NULL,
+    fullname VARCHAR(100) NOT NULL,
+    admin Boolean DEFAULT FALSE
+);
+
+# Mostrar tabla
+SELECT col.table_name,
+       col.column_name,
+       col.data_type,
+       col.column_default
+FROM information_schema.columns col
+WHERE table_name = 'users';
+
+# Tabla de pqrs
+CREATE TYPE tipo_pqr AS ENUM ('Petición', 'Queja', 'Reclamo');
+CREATE TYPE estado_pqr AS ENUM ('Nuevo', 'En ejecución', 'Cerrado');
+
+CREATE TABLE pqrs(
+   id SERIAL PRIMARY KEY,
+   user_id Int NOT  NULL,
+   tipo tipo_pqr NOT NULL,
+   asunto TEXT NOT NULL,
+   estado estado_pqr NOT NULL DEFAULT 'Nuevo',
+   created_at DATE DEFAULT current_date,
+   expired_at DATE NOT NULL,
+   CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+# Mostrar tabla pqrs
+SELECT col.table_name,
+       col.column_name,
+       col.data_type,
+       col.column_default
+FROM information_schema.columns col
+WHERE table_name = 'pqrs';
