@@ -1,5 +1,5 @@
 # Crear base de datos
-createdb database_pqrs;
+create database database_pqrs;
 
 # conectarse a la base de datos
 \c database_pqrs;
