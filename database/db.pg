@@ -69,3 +69,43 @@ WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
+-- Tabla de auditoria 
+CREATE TYPE accion_crud AS ENUM ('CREATE', 'UPDATE', 'DELETE');
+
+CREATE TABLE auditoria (
+  fecha TIMESTAMP NOT NULL,
+  usuario_web INTEGER NOT NULL,
+  usuario_bd VARCHAR(20) NOT NULL,
+  accion accion_crud NOT NULL,
+  CONSTRAINT fk_user_web FOREIGN KEY (usuario_web) REFERENCES users(id)
+);
+
+CREATE OR REPLACE FUNCTION fn_log_auditar() RETURNS TRIGGER AS 
+$auditar_tg$
+BEGIN
+  IF (TG_OP = 'DELETE') THEN
+  INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
+    VALUES (NOW(), OLD.user_id, USER, 'DELETE');
+    RETURN OLD;
+  ELSEIF (TG_OP = 'UPDATE') THEN
+    INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
+    VALUES (NOW(), OLD.user_id, USER, 'UPDATE');
+    RETURN NEW;
+  ELSEIF (TG_OP = 'INSERT') THEN
+    INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
+    VALUES (NOW(), OLD.user_id, USER, 'INSERT');
+    RETURN NEW;
+  END IF;
+  RETURN NULL;
+END;
+$auditar_tg$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_tg AFTER INSERT OR UPDATE OR DELETE
+ON pqrs FOR EACH ROW
+EXECUTE PROCEDURE  fn_log_auditar();
+
+CREATE TRIGGER audit_tg AFTER INSERT OR UPDATE OR DELETE
+ON users FOR EACH ROW
+EXECUTE PROCEDURE  fn_log_auditar();
+ 
