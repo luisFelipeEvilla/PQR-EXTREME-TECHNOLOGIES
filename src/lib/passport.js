@@ -33,7 +33,7 @@ passport.use(
                     done(null, false, req.flash('message', 'Contraseña Incorrecta'));
                 }
             } else {
-                return done(null, false, req.flash('message', 'El nombre de  usuario ingresado no existe'));
+                done(null, false, req.flash('message', 'El nombre de  usuario ingresado no existe'));
             }
         } catch (error) {
             
@@ -61,7 +61,7 @@ passport.use(
 
       try {
         newUser.password = await helpers.encrypPassword(password);
-
+        console.log(newUser.password);
         const q = {
           text:
             "INSERT INTO users(password, fullname, email, phone, admin) VALUES($1, $2, $3, $4, $5) RETURNING id, email fullname",

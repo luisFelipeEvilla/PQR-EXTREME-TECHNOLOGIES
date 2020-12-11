@@ -37,19 +37,6 @@ CREATE TABLE pqrs(
    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-DECLARE  tipo := SELECT tipo from pqrs limit 1;
-
-
-CREATE FUNCTION setExpired_at() RETURNS trigger
-  LANGUAGE plgsql
-  AS $$
-  BEGIN
-    UPDATE pqrs 
-    SET expired_at = created_at + '7 days'
-    WHERE  tipo = 'Petición';
-
-
-
 -- Mostrar tabla pqrs
 SELECT col.table_name,
        col.column_name,
@@ -93,9 +80,11 @@ BEGIN
     VALUES (NOW(), NEW.user_id, USER, 'UPDATE');
     RETURN NEW;
   ELSEIF (TG_OP = 'INSERT') THEN
-    INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
-    VALUES (NOW(), NEW.user_id, USER, 'CREATE');
-    RETURN NEW;
+    IF (TG_TABLE_NAME = 'pqrs') THEN
+      INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
+      VALUES (NOW(), NEW.user_id, USER, 'CREATE');
+      RETURN NEW;
+    END IF;
   END IF;
   RETURN NULL;
 END;
