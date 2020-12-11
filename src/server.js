@@ -10,6 +10,7 @@ const config = require('./config');
 const pool = require('./database');
 const passport = require('passport');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const { PORT, SECRET } = config;
 
@@ -45,7 +46,8 @@ app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(helmet());
+//app.use(helmet());
+app.use(cors());
 
 // Variables globales
 app.use((req, res, next) => {
