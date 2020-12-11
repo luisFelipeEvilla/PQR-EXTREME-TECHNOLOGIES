@@ -1,4 +1,4 @@
-<div class="container p-4">
+<div class="container p-4" id="pqr">
     <div class="row">
         <div class="col-md-4 mx-auto" style="margin: 1rem">
                 <div class="card" style="width: 18rem;">
@@ -14,9 +14,16 @@
                         <p class="text-muted">Creado {{timeago pqr.created_at}}</p>
                         <p class="text-muted">Expira {{timeago pqr.expired_at}}</p>
                         {{#if user.admin}}
+                        <div class="container text-center">
                             <a href="/pqrs/delete/{{pqr.id}}" class="btn btn-danger">Eliminar</a>
                             <a href="/pqrs/edit/{{pqr.id}}" class="btn btn-secondary">Editar</a>
+                        </div>
                         {{/if}}
+                        <div class="container text-center">
+                        <button type="button" class="btn btn-secondary mt-2" id="pdfBtn">Generar PDF</button>
+                        </div>
+                        <script src="convertToPdf.js"></script>
+                        <script src="html2pdf.bundle.min.js"></script>
                     </div>
                 </div>
             </div>
