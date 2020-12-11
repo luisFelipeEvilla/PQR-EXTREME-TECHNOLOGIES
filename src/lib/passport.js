@@ -8,15 +8,15 @@ const {} = require("./helpers");
 passport.use(
     "local.signin",
     new LocalStrategy({
-        usernameField: "username",
+        usernameField: "email",
         passwordField: "password",
         passReqToCallback: true
     },
-    async(req, username, password, done) => {
+    async(req, email, password, done) => {
         try {
             const q = {
-                text: 'SELECT * FROM users WHERE username = $1',
-                values: [username]
+                text: 'SELECT * FROM users WHERE email = $1',
+                values: [email]
             }
 
             const result = await query(q);
@@ -28,7 +28,7 @@ passport.use(
                 const validPassword = await helpers.mathPassword(password, user.password);
          
                 if (validPassword) {
-                    done(null, user, req.flash('success', `Bienvenido ${user.username}`));
+                    done(null, user, req.flash('success', `Bienvenido ${user.fullname}`));
                 } else {
                     done(null, false, req.flash('message', 'Contraseña Incorrecta'));
                 }
@@ -45,17 +45,18 @@ passport.use(
   "local.signup",
   new LocalStrategy(
     {
-      usernameField: "username",
+      usernameField: "email",
       passwordField: "password",
       passReqToCallback: true,
     },
-    async (req, username, password, done) => {
-      const { fullname } = req.body;
+    async (req, email, password, done) => {
+      const { fullname, phone } = req.body;
 
       const newUser = {
-        username,
         password,
-        fullname: fullname,
+        fullname,
+        email,
+        phone
       };
 
       try {
@@ -63,11 +64,12 @@ passport.use(
 
         const q = {
           text:
-            "INSERT INTO users(username, password, fullname) VALUES($1, $2, $3) RETURNING id, username, fullname",
-          values: [newUser.username, newUser.password, newUser.fullname],
+            "INSERT INTO users(password, fullname, email, phone, admin) VALUES($1, $2, $3, $4, $5) RETURNING id, email fullname",
+          values: [newUser.password, newUser.fullname, newUser.email, newUser.phone, true],
         };
         const result = await query(q);
         newUser.id = result.rows[0].id;
+        newUser.admin = result.rows[0].admin;
         done (null, newUser)
       } catch (error) {
           done(error);

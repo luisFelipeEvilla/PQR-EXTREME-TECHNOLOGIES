@@ -1,19 +1,20 @@
-# Crear base de datos
+--  Crear base de datos
 create database pqrs;
 
-# conectarse a la base de datos
+-- conectarse a la base de datos
 \c pqrs;
 
-# Crear tabla de usuarios
+--  Crear tabla de usuarios
 CREATE TABLE users(
     id serial PRIMARY KEY,
-    username VARCHAR(16) NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
     password VARCHAR(60) NOT NULL,
     fullname VARCHAR(100) NOT NULL,
+    phone VARCHAR(18) NOT NULL, 
     admin Boolean DEFAULT FALSE
 );
 
-# Mostrar tabla
+--  Mostrar tabla
 SELECT col.table_name,
        col.column_name,
        col.data_type,
@@ -21,7 +22,7 @@ SELECT col.table_name,
 FROM information_schema.columns col
 WHERE table_name = 'users';
 
-# Tabla de pqrs
+--  Tabla de pqrs
 CREATE TYPE tipo_pqr AS ENUM ('Petición', 'Queja', 'Reclamo');
 CREATE TYPE estado_pqr AS ENUM ('Nuevo', 'En ejecución', 'Cerrado');
 
@@ -36,7 +37,20 @@ CREATE TABLE pqrs(
    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-# Mostrar tabla pqrs
+DECLARE  tipo := SELECT tipo from pqrs limit 1;
+
+
+CREATE FUNCTION setExpired_at() RETURNS trigger
+  LANGUAGE plgsql
+  AS $$
+  BEGIN
+    UPDATE pqrs 
+    SET expired_at = created_at + '7 days'
+    WHERE  tipo = 'Petición';
+
+
+
+-- Mostrar tabla pqrs
 SELECT col.table_name,
        col.column_name,
        col.data_type,
@@ -44,7 +58,7 @@ SELECT col.table_name,
 FROM information_schema.columns col
 WHERE table_name = 'pqrs';
 
-# Tabla de sesiones
+-- Tabla de sesiones
 CREATE TABLE "session" (
   "sid" varchar NOT NULL COLLATE "default",
 	"sess" json NOT NULL,

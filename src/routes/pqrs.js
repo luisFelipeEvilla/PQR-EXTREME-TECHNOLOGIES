@@ -5,10 +5,14 @@ const router = express.Router();
 const { isLoggedIn } = require('../lib/auth');
 
 router.get('/', isLoggedIn, async (req, res) => {
-    const q = {
-        text: 'SELECT username, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id ORDER BY created_at DESC'
+    const q = {};
+    console.log(req.user);
+    if (req.user.admin) {
+        q.text = 'SELECT email, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id ORDER BY created_at DESC'
+    } else {
+        q.text = 'SELECT email, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id WHERE users.id = $1 ORDER BY created_at DESC';
+        q.values = [req.user.id];     
     }
-
     const result = await query(q)
     const pqrs = result.rows;
 
@@ -21,30 +25,42 @@ router.get('/add', isLoggedIn, (req, res) => {
 
 router.get('/:id', isLoggedIn, async (req, res) => {
     const q = {
-        text: 'SELECT username, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id WHERE pqrs.id = $1',
+        text: 'SELECT email, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id WHERE pqrs.id = $1',
         values: [req.params.id]
     }
 
     const result = await query(q);
     const pqr = result.rows[0];
+    const { user } = req;
 
-    res.render('pqrs/pqr', {pqr});
+    res.render('pqrs/pqr', {pqr, user});
 })
 
-router.post('/add', isLoggedIn, (req, res) => {
+router.post('/add', isLoggedIn, async (req, res) => {
     const { tipo, asunto } = req.body;
 
-    // temporal 
-    const user = {
-        id: 1
-    };
+    const { user } = req;
 
     const newPQR = {
         user_id: user.id,
         tipo,
         asunto,
-        expired_at: '2020-12-17'
+        expired_at: new Date()
     };
+    const result = await query('SELECT NOW()')
+    const date = result.rows[0];
+    const t = new Date(date.now);
+
+    if (tipo.localeCompare('Petición') == 0) {
+        console.log('peticion');
+        newPQR.expired_at = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 7, t.getHours(), t.getMinutes());     
+    } else {
+        if (tipo.localeCompare('Queja') == 0) {
+            newPQR.expired_at = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 3, t.getHours(), t.getMinutes());
+        } else {
+            newPQR.expired_at = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 2, t.getHours(), t.getMinutes());
+        }
+    }
 
     const q = {
          text: 'INSERT INTO pqrs(user_id, tipo, asunto, expired_at) VALUES($1, $2, $3, $4) RETURNING *',
