@@ -6,7 +6,43 @@ const helpers = require("./helpers");
 const {} = require("./helpers");
 
 passport.use(
-  "local",
+    "local.signin",
+    new LocalStrategy({
+        usernameField: "username",
+        passwordField: "password",
+        passReqToCallback: true
+    },
+    async(req, username, password, done) => {
+        try {
+            const q = {
+                text: 'SELECT * FROM users WHERE username = $1',
+                values: [username]
+            }
+
+            const result = await query(q);
+ 
+            if (result.rows.length > 0) {
+
+                const user = result.rows[0];
+
+                const validPassword = await helpers.mathPassword(password, user.password);
+         
+                if (validPassword) {
+                    done(null, user, req.flash('success', `Bienvenido ${user.username}`));
+                } else {
+                    done(null, false, req.flash('message', 'Contraseña Incorrecta'));
+                }
+            } else {
+                return done(null, false, req.flash('message', 'El nombre de  usuario ingresado no existe'));
+            }
+        } catch (error) {
+            
+        }
+    })
+)
+
+passport.use(
+  "local.signup",
   new LocalStrategy(
     {
       usernameField: "username",
