@@ -49,6 +49,7 @@ app.use(passport.session());
 app.use((req, res, next) => {
     app.locals.success = req.flash('success');
     app.locals.message = req.flash('message');
+    app.locals.user = req.user;
     next();
 })
 
@@ -56,6 +57,10 @@ app.use((req, res, next) => {
 app.use(require('./routes'));
 app.use(require('./routes/autenticacion'));
 app.use('/pqrs', require('./routes/pqrs'));
+
+app.get('/', (req, res) => {
+    res.redirect('/pqrs');
+})
 
 // Ejecutar servidor
 app.listen(PORT, () => {
