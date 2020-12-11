@@ -90,11 +90,11 @@ BEGIN
     RETURN OLD;
   ELSEIF (TG_OP = 'UPDATE') THEN
     INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
-    VALUES (NOW(), OLD.user_id, USER, 'UPDATE');
+    VALUES (NOW(), NEW.user_id, USER, 'UPDATE');
     RETURN NEW;
   ELSEIF (TG_OP = 'INSERT') THEN
     INSERT INTO auditoria("fecha", "usuario_web", "usuario_bd", "accion")
-    VALUES (NOW(), OLD.user_id, USER, 'INSERT');
+    VALUES (NOW(), NEW.user_id, USER, 'CREATE');
     RETURN NEW;
   END IF;
   RETURN NULL;

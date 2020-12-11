@@ -37,6 +37,11 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label class="form-label" for="created_at">Email</label>
+                            <input type="text" class="form-control" name="created_at" id="created_at"
+                                value="{{pqr.email}}" disabled></input>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label" for="created_at">Fecha de creación</label>
                             <input type="text" class="form-control" name="created_at" id="created_at"
                                 value="{{timeago pqr.created_at}}" disabled></input>

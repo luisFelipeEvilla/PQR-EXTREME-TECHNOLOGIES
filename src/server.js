@@ -9,6 +9,7 @@ const chalk = require('chalk');
 const config = require('./config');
 const pool = require('./database');
 const passport = require('passport');
+const helmet = require('helmet');
 
 const { PORT, SECRET } = config;
 
@@ -44,6 +45,7 @@ app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(helmet());
 
 // Variables globales
 app.use((req, res, next) => {
@@ -57,6 +59,7 @@ app.use((req, res, next) => {
 app.use(require('./routes'));
 app.use(require('./routes/autenticacion'));
 app.use('/pqrs', require('./routes/pqrs'));
+app.use('/users', require('./routes/users'));
 
 app.get('/', (req, res) => {
     res.redirect('/pqrs');

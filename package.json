@@ -33,6 +33,7 @@
     "express": "^4.17.1",
     "express-handlebars": "^5.2.0",
     "express-session": "^1.17.1",
+    "helmet": "^4.2.0",
     "html2pdf.js": "^0.9.2",
     "javascript-time-ago": "^2.3.3",
     "morgan": "^1.10.0",

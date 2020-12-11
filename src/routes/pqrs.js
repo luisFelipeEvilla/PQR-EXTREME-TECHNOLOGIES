@@ -2,7 +2,8 @@ const express = require('express');
 const query = require('../lib/query');
 
 const router = express.Router();
-const { isLoggedIn } = require('../lib/auth');
+const { isLoggedIn,
+    isAdmin } = require('../lib/auth');
 
 router.get('/', isLoggedIn, async (req, res) => {
     const q = {};
@@ -19,7 +20,7 @@ router.get('/', isLoggedIn, async (req, res) => {
     res.render('pqrs/list', {pqrs});
 })
 
-router.get('/add', isLoggedIn, (req, res) => {
+router.get('/add', isAdmin, isLoggedIn, (req, res) => {
     res.render('pqrs/add');
 })
 
@@ -36,10 +37,23 @@ router.get('/:id', isLoggedIn, async (req, res) => {
     res.render('pqrs/pqr', {pqr, user});
 })
 
-router.post('/add', isLoggedIn, async (req, res) => {
-    const { tipo, asunto } = req.body;
+router.post('/add', isAdmin, isLoggedIn, async (req, res) => {
+    const { tipo, asunto, email } = req.body;
 
-    const { user } = req;
+    const q = {
+        text: 'SELECT id FROM users WHERE email = $1',
+        values: [email]
+    };
+    
+    const r = await query(q);
+    const user = {};
+
+    if (r.rows.length > 0) {
+        user.id = r.rows[0].id;
+    } else {
+        user.id = req.user.id;
+        req.flash('message', `el usuario ${email} no existe`)
+    }
 
     const newPQR = {
         user_id: user.id,
@@ -52,7 +66,6 @@ router.post('/add', isLoggedIn, async (req, res) => {
     const t = new Date(date.now);
 
     if (tipo.localeCompare('Petición') == 0) {
-        console.log('peticion');
         newPQR.expired_at = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 7, t.getHours(), t.getMinutes());     
     } else {
         if (tipo.localeCompare('Queja') == 0) {
@@ -61,19 +74,17 @@ router.post('/add', isLoggedIn, async (req, res) => {
             newPQR.expired_at = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 2, t.getHours(), t.getMinutes());
         }
     }
-
-    const q = {
-         text: 'INSERT INTO pqrs(user_id, tipo, asunto, expired_at) VALUES($1, $2, $3, $4) RETURNING *',
-        values: [newPQR.user_id, newPQR.tipo, newPQR.asunto, newPQR.expired_at]
+ 
+    q.text = 'INSERT INTO pqrs(user_id, tipo, asunto, expired_at) VALUES($1, $2, $3, $4) RETURNING *';
+    q.values = [newPQR.user_id, newPQR.tipo, newPQR.asunto, newPQR.expired_at]
     
-    }
     
     query(q);
     req.flash('success', 'El PQR se ha generado satisfactoriamente');
     res.redirect('/pqrs');
 })
 
-router.get('/delete/:id', isLoggedIn, async (req, res) => {
+router.get('/delete/:id', isLoggedIn, isAdmin, async (req, res) => {
     const {id} = req.params;
 
     const q = {
@@ -90,7 +101,7 @@ router.get('/edit/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
 
     const q = {
-        text: 'SELECT * FROM pqrs where id = $1',
+        text: 'SELECT email, pqrs.id, tipo, asunto, estado, created_at, expired_at FROM pqrs INNER JOIN users ON pqrs.user_id = users.id WHERE pqrs.id = $1',
         values: [id]
     }
 
@@ -99,7 +110,7 @@ router.get('/edit/:id', isLoggedIn, async (req, res) => {
     res.render('pqrs/edit', {pqr : pqr.rows[0]});
 })
 
-router.post('/edit/:id', isLoggedIn, async (req, res) => {
+router.post('/edit/:id', isLoggedIn, isAdmin, async (req, res) => {
     const { id } = req.params;
     const { 
         asunto,
