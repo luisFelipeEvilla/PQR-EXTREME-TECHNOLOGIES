@@ -13,7 +13,7 @@ pool.connect()
         console.error(err);
     });
     
-pool.query('SELECT NOW()')
+pool.query("SELECT NOW()")
     .then(response => {
         console.log(response.rows);
     })

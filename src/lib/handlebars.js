@@ -11,8 +11,6 @@ helpers.timeago = (timestamp) => {
 };
 
 helpers.ifequals = (string1, string2, opts) => {
-  console.log(string1);
-  console.log(string2);
   if (string1.localeCompare(string2) == 0) {
     return opts.fn(this);
   }

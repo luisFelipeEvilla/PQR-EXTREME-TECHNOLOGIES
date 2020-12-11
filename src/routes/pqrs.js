@@ -50,7 +50,7 @@ router.post('/add', (req, res) => {
     }
     
     query(q);
-
+    req.flash('success', 'El PQR se ha generado satisfactoriamente');
     res.redirect('/pqrs');
 })
 
@@ -63,6 +63,7 @@ router.get('/delete/:id', async (req, res) => {
     }
   
     await query(q);
+    req.flash('success', 'PQR removido satisfactoriamente');
     res.redirect('/pqrs');
 })
 
@@ -92,7 +93,7 @@ router.post('/edit/:id', async (req, res) => {
     }
     
     await query(q);
-
+    req.flash('sucess', 'PQR actualizado satisfactoriamente');
     res.redirect('/pqrs');
 })
 

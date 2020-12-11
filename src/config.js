@@ -8,5 +8,6 @@ module.exports = {
         database: process.env.DB_NAME || 'pqrs',
         password: process.env.DB_PASSWORD || 'password',
         port: process.env.DB_PORT || 5432
-    }
+    },
+    SECRET: process.env.SECRET || 'secret'
 }
