@@ -8,12 +8,13 @@ const exphbs = require('express-handlebars')
 const chalk = require('chalk');
 const config = require('./config');
 const pool = require('./database');
-
+const passport = require('passport');
 
 const { PORT, SECRET } = config;
 
 // Inicializar el servidor
 const app = express();
+require('./lib/passport');
 
 // Setup del servidor
 app.set('views', path.join(__dirname, 'views'));
@@ -41,6 +42,8 @@ app.use(session({
 }))
 app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Variables globales
 app.use((req, res, next) => {

@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/luisFelipeEvilla/PQR-EXTREME-TECHNOLOGIES#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "chalk": "^4.1.0",
     "connect-flash": "^0.1.1",
@@ -34,6 +35,8 @@
     "express-session": "^1.17.1",
     "javascript-time-ago": "^2.3.3",
     "morgan": "^1.10.0",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
     "pg": "^8.5.1",
     "pg-promise": "^10.8.1"
   },

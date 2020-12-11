@@ -1,9 +1,9 @@
 const express = require('express');
 const { route } = require('.');
-
+const query = require('../lib/query');
+ 
 const router = express.Router();
 
-const pool = require('../database');
 
 router.get('/', async (req, res) => {
     const q = {
@@ -96,19 +96,5 @@ router.post('/edit/:id', async (req, res) => {
     req.flash('sucess', 'PQR actualizado satisfactoriamente');
     res.redirect('/pqrs');
 })
-
-async function query(q) {
-    let res;
-
-    try {
-        res = await pool.query(q);
-        console.log(res.rows[0]);
-    } catch (err) {
-        console.log(err.stack);
-    }
-
-    return res.rows;
-   
-}
 
 module.exports = router;
